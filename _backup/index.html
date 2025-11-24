@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riznica | Volunteer to Volunteer</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        apple: {
+                            gray: '#F5F5F7',
+                            blue: '#0071E3',
+                            text: '#1D1D1F',
+                            subtext: '#86868B',
+                            border: '#D2D2D7'
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 24px rgba(0, 0, 0, 0.04)',
+                        'card': '0 2px 12px rgba(0, 0, 0, 0.06)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #D2D2D7; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #86868B; }
+
+        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        .slide-up { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .spin { animation: spin 1s linear infinite; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+    </style>
+</head>
+<body class="bg-apple-gray text-apple-text font-sans antialiased selection:bg-apple-blue selection:text-white">
+
+    <div id="app" class="min-h-screen relative flex flex-col">
+        </div>
+
+    <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <script type="module">
+        import { Store } from './js/store.js';
+        import { Actions } from './js/actions.js';
+        
+        // Expose Actions to window so onclick="..." works in HTML strings
+        window.Actions = Actions;
+        
+        // Start the app
+        document.addEventListener('DOMContentLoaded', Actions.init);
+    </script>
+</body>
+</html>
