@@ -42,22 +42,20 @@ function App() {
             <div className="bg-gray-100 p-1 rounded-full border border-gray-200 flex shadow-inner">
               <button
                 onClick={() => setViewMode('list')}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1 transition-all ${viewMode === 'list'
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${viewMode === 'list'
                   ? 'bg-white text-gray-900 shadow-sm'
                   : 'text-gray-500 hover:text-gray-900'
                   }`}
               >
-                <span className="material-symbols-rounded text-sm">list</span>
                 List
               </button>
               <button
                 onClick={() => setViewMode('map')}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1 transition-all ${viewMode === 'map'
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${viewMode === 'map'
                   ? 'bg-white text-gray-900 shadow-sm'
                   : 'text-gray-500 hover:text-gray-900'
                   }`}
               >
-                <span className="material-symbols-rounded text-sm">map</span>
                 Map
               </button>
             </div>
