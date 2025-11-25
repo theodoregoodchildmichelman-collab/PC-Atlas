@@ -54,81 +54,122 @@ export default function DetailModal({ resource, onClose, userName }) {
         }
     };
 
+    const handleShare = async () => {
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: resource.title,
+                    text: resource.description,
+                    url: window.location.href
+                });
+            } catch (err) {
+                console.log('Error sharing:', err);
+            }
+        } else {
+            handleCopyLink();
+        }
+    };
+
+    const handleCopyLink = () => {
+        navigator.clipboard.writeText(window.location.href);
+        alert('Link copied to clipboard!');
+    };
+
+    const handlePrint = () => {
+        window.print();
+    };
+
     if (!resource) return null;
 
     return (
-        <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm flex items-end sm:items-center justify-center z-50 sm:p-4 animate-fade-in">
-            <div className="bg-white w-full max-w-5xl h-[90vh] sm:h-[85vh] sm:rounded-3xl rounded-t-3xl flex flex-col shadow-2xl animate-slide-up border border-white/50 overflow-hidden">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in print:bg-white print:p-0 print:static">
+            <div className="bg-white rounded-3xl w-full max-w-5xl max-h-[90vh] overflow-hidden shadow-2xl relative print:shadow-none print:max-h-full print:w-full flex flex-col">
 
-                {/* Header */}
-                <div className="p-6 border-b border-gray-100 flex justify-between items-start flex-shrink-0 bg-gray-50/50 backdrop-blur-md z-10">
-                    <div className="pr-8">
-                        <h2 className="text-2xl font-bold text-gray-900 line-clamp-2 leading-tight tracking-tight">{resource.title}</h2>
-                        <div className="flex items-center gap-2 mt-2 text-sm text-gray-500 font-medium">
-                            <span className="bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider">Author</span>
-                            {resource.authorName || 'Anonymous'}
-                        </div>
+                {/* Header Image */}
+                <div className="h-64 bg-gradient-to-r from-indigo-500 to-purple-600 relative print:hidden flex-shrink-0">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                        <h2 className="text-4xl font-bold text-white text-center px-4 drop-shadow-md">{resource.title}</h2>
                     </div>
-                    <button onClick={onClose} className="p-2 bg-white rounded-full hover:bg-gray-100 transition-colors shadow-sm border border-gray-100 text-gray-400 hover:text-gray-600">
+                    <button
+                        onClick={onClose}
+                        className="absolute top-4 right-4 bg-black/20 hover:bg-black/40 text-white p-2 rounded-full transition-all backdrop-blur-md"
+                    >
                         <span className="material-symbols-rounded">close</span>
                     </button>
                 </div>
 
                 <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
                     {/* Left Column: Resource Details */}
-                    <div className="flex-1 overflow-y-auto p-8 lg:border-r border-gray-100">
-                        <div className="mb-10">
-                            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Description</h3>
-                            <p className="text-gray-700 leading-loose text-lg whitespace-pre-wrap">{resource.description}</p>
-                            <div className="mt-6 flex flex-wrap gap-2">
-                                {resource.tags.map(tag => (
-                                    <span key={tag} className="text-sm font-bold text-indigo-600 bg-indigo-50 px-4 py-1.5 rounded-full border border-indigo-100">
-                                        #{tag}
-                                    </span>
-                                ))}
-                            </div>
+                    <div className="flex-1 overflow-y-auto p-8 lg:border-r border-gray-100 print:p-0">
+                        {/* Title for Print */}
+                        <h1 className="hidden print:block text-3xl font-bold mb-4">{resource.title}</h1>
 
-                            <div className="flex flex-wrap gap-3 mb-6">
-                                {resource.timeCommitment && (
-                                    <span className="inline-flex items-center gap-1 text-sm text-gray-700 bg-purple-50 px-3 py-1.5 rounded-lg border border-purple-100">
-                                        <span className="material-symbols-rounded text-purple-500 text-lg">schedule</span>
-                                        {resource.timeCommitment.split(' ')[0]}
-                                    </span>
-                                )}
-                                {resource.cost && (
-                                    <span className="inline-flex items-center gap-1 text-sm text-gray-700 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-100">
-                                        <span className="material-symbols-rounded text-emerald-500 text-lg">savings</span>
-                                        {resource.cost.split(' ')[0]}
-                                    </span>
-                                )}
-                                {resource.audience && (
-                                    <span className="inline-flex items-center gap-1 text-sm text-gray-700 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100">
-                                        <span className="material-symbols-rounded text-blue-500 text-lg">group</span>
-                                        {resource.audience}
-                                    </span>
-                                )}
-                                {resource.location && (
-                                    <span className="inline-flex items-center gap-1 text-sm text-gray-700 bg-red-50 px-3 py-1.5 rounded-lg border border-red-100">
-                                        <span className="material-symbols-rounded text-red-500 text-lg">location_on</span>
-                                        {resource.location}
-                                    </span>
-                                )}
-                            </div>
+                        {/* Agentic Toolbar */}
+                        <div className="flex gap-2 mb-6 print:hidden">
+                            <button onClick={handleShare} className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-sm font-bold text-gray-700 transition-colors">
+                                <span className="material-symbols-rounded text-lg">share</span> Share
+                            </button>
+                            <button onClick={handleCopyLink} className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-sm font-bold text-gray-700 transition-colors">
+                                <span className="material-symbols-rounded text-lg">link</span> Copy Link
+                            </button>
+                            <button onClick={handlePrint} className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-sm font-bold text-gray-700 transition-colors">
+                                <span className="material-symbols-rounded text-lg">print</span> Print
+                            </button>
                         </div>
 
-                        {/* File Preview Removed */}
+                        <div className="flex flex-wrap gap-3 mb-6">
+                            {resource.timeCommitment && (
+                                <span className="inline-flex items-center gap-1 text-sm text-gray-700 bg-purple-50 px-3 py-1.5 rounded-lg border border-purple-100">
+                                    <span className="material-symbols-rounded text-purple-500 text-lg">schedule</span>
+                                    <span className="font-bold">Schedule:</span> {resource.timeCommitment}
+                                </span>
+                            )}
+                            {resource.cost && (
+                                <span className="inline-flex items-center gap-1 text-sm text-gray-700 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-100">
+                                    <span className="material-symbols-rounded text-emerald-500 text-lg">savings</span>
+                                    <span className="font-bold">Cost:</span> {resource.cost}
+                                </span>
+                            )}
+                            {resource.audience && (
+                                <span className="inline-flex items-center gap-1 text-sm text-gray-700 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100">
+                                    <span className="material-symbols-rounded text-blue-500 text-lg">group</span>
+                                    <span className="font-bold">Group:</span> {resource.audience}
+                                </span>
+                            )}
+                            {resource.location && (
+                                <span className="inline-flex items-center gap-1 text-sm text-gray-700 bg-red-50 px-3 py-1.5 rounded-lg border border-red-100">
+                                    <span className="material-symbols-rounded text-red-500 text-lg">location_on</span>
+                                    <span className="font-bold">Location:</span> {resource.location}
+                                </span>
+                            )}
+                        </div>
 
-                        <button
-                            onClick={handleDownload}
-                            className="w-full bg-indigo-600 text-white font-bold py-4 rounded-xl hover:bg-indigo-700 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-indigo-500/30 flex items-center justify-center gap-3 text-lg"
-                        >
-                            <span className="material-symbols-rounded">download</span>
-                            Download
-                        </button>
+                        <div className="prose prose-indigo max-w-none text-gray-600 mb-8">
+                            <p className="whitespace-pre-wrap leading-relaxed">{resource.description}</p>
+                        </div>
+
+                        <div className="mt-6 flex flex-wrap gap-2 mb-8">
+                            {resource.tags && resource.tags.map(tag => (
+                                <span key={tag} className="text-sm font-bold text-indigo-600 bg-indigo-50 px-4 py-1.5 rounded-full border border-indigo-100">
+                                    #{tag}
+                                </span>
+                            ))}
+                        </div>
+
+                        {/* Download Button */}
+                        {resource.fileUrl && (
+                            <button
+                                onClick={handleDownload}
+                                className="w-full sm:w-auto bg-indigo-600 text-white px-8 py-4 rounded-xl font-bold shadow-lg shadow-indigo-500/30 hover:bg-indigo-700 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 mb-8 print:hidden"
+                            >
+                                <span className="material-symbols-rounded text-2xl">download</span>
+                                Download Resource
+                            </button>
+                        )}
                     </div>
 
                     {/* Right Column: Forum Sidebar */}
-                    <div className="w-full lg:w-96 bg-gray-50 flex flex-col border-l border-gray-100">
+                    <div className="w-full lg:w-96 bg-gray-50 flex flex-col border-l border-gray-100 print:hidden">
                         <div className="p-4 border-b border-gray-200 bg-white/50 backdrop-blur-sm">
                             <h3 className="font-bold text-gray-900 flex items-center gap-2">
                                 <span className="material-symbols-rounded text-indigo-600">forum</span>

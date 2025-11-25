@@ -171,6 +171,8 @@ export default function Feed({ onResourceClick, viewMode, userName, onEdit }) {
         filteredResources = [...filteredResources].sort((a, b) => b.createdAt - a.createdAt);
     }
 
+    const [showMap, setShowMap] = useState(false);
+
     if (loading) {
         return (
             <div className="flex justify-center py-24">
@@ -180,13 +182,13 @@ export default function Feed({ onResourceClick, viewMode, userName, onEdit }) {
     }
 
     return (
-        <div className="space-y-8 relative">
+        <div className="space-y-8 relative min-h-screen">
             <div className="flex flex-col gap-6">
                 {/* Search Bar */}
                 <div className="relative w-full max-w-2xl mx-auto">
                     <input
                         type="text"
-                        placeholder="Search resources (e.g., 'quick english lesson', 'free camps')..."
+                        placeholder="Search something, find anything..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="w-full pl-12 pr-4 py-4 rounded-full bg-white border border-gray-200 shadow-sm focus:shadow-md focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all outline-none text-lg"
@@ -194,73 +196,101 @@ export default function Feed({ onResourceClick, viewMode, userName, onEdit }) {
                     <span className="material-symbols-rounded absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-2xl">search</span>
                 </div>
 
-                {/* Tag Filter */}
-                <div className="overflow-x-auto pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 sm:pb-0 scrollbar-hide w-full flex justify-center">
-                    <div className="flex gap-3 items-center">
-                        {tags.map(tag => {
-                            const isActive = activeTag === tag.name;
-                            // Default inactive style
-                            let buttonClass = 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50';
+                {/* Categories & Filters */}
+                <div className="w-full flex justify-center">
+                    <div className="flex flex-col sm:flex-row gap-4 items-center overflow-x-auto pb-4 sm:pb-0 scrollbar-hide max-w-full px-4">
 
-                            if (isActive) {
-                                // Active style based on color
-                                buttonClass = `${tag.color} text-white shadow-lg scale-105 border-transparent`;
-                            }
+                        {/* Group 1: All & Top */}
+                        <div className="flex gap-2 bg-gray-100 p-1.5 rounded-full flex-shrink-0">
+                            <button
+                                onClick={() => setActiveTag('All')}
+                                className={`px-5 py-2 rounded-full text-sm font-bold transition-all ${activeTag === 'All'
+                                    ? 'bg-white text-blue-600 shadow-sm'
+                                    : 'text-gray-500 hover:text-gray-900'}`}
+                            >
+                                All
+                            </button>
+                            <button
+                                onClick={() => setSortBy(sortBy === 'top' ? 'newest' : 'top')}
+                                className={`px-5 py-2 rounded-full text-sm font-bold transition-all flex items-center gap-1 ${sortBy === 'top'
+                                    ? 'bg-white text-red-600 shadow-sm'
+                                    : 'text-gray-500 hover:text-gray-900'
+                                    }`}
+                            >
+                                🔥 Top
+                            </button>
+                        </div>
 
-                            return (
-                                <button
-                                    key={tag.name}
-                                    onClick={() => setActiveTag(tag.name)}
-                                    className={`px-6 py-3 rounded-full text-base font-medium whitespace-nowrap transition-all duration-300 ${buttonClass}`}
-                                >
-                                    {tag.emoji}{tag.name}
-                                </button>
-                            );
-                        })}
+                        {/* Divider */}
+                        <div className="hidden sm:block w-px h-8 bg-gray-200"></div>
 
-                        {/* Top Filter */}
-                        <div className="w-px h-8 bg-gray-200 mx-2"></div>
-                        <button
-                            onClick={() => setSortBy(sortBy === 'top' ? 'newest' : 'top')}
-                            className={`px-6 py-3 rounded-full text-base font-medium whitespace-nowrap transition-all duration-300 flex items-center gap-2 ${sortBy === 'top'
-                                ? 'bg-red-600 text-white shadow-lg shadow-red-500/30 scale-105'
-                                : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
-                                }`}
-                        >
-                            🔥 Top
-                        </button>
+                        {/* Group 2: Categories */}
+                        <div className="flex gap-2 flex-nowrap">
+                            {tags.filter(t => t.name !== 'All').map(tag => {
+                                const isActive = activeTag === tag.name;
+                                let buttonClass = 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50';
+
+                                if (isActive) {
+                                    buttonClass = `${tag.color} text-white shadow-lg scale-105 border-transparent`;
+                                }
+
+                                return (
+                                    <button
+                                        key={tag.name}
+                                        onClick={() => setActiveTag(tag.name)}
+                                        className={`px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 ${buttonClass}`}
+                                    >
+                                        {tag.emoji}{tag.name}
+                                    </button>
+                                );
+                            })}
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {/* Content */}
-            {viewMode === 'map' ? (
-                <ResourceMap resources={filteredResources} onResourceClick={onResourceClick} />
-            ) : (
-                <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                    {filteredResources.length === 0 ? (
-                        <div className="col-span-full text-center py-12 text-gray-500">
-                            <p className="text-lg">No resources found for "{searchQuery || activeTag}".</p>
-                            <p className="text-sm mt-2">Try adjusting your search or be the first to share something!</p>
+            {/* Content Grid - 2 Columns Max */}
+            <div className="grid gap-8 grid-cols-1 md:grid-cols-2 max-w-5xl mx-auto">
+                {filteredResources.length === 0 ? (
+                    <div className="col-span-full text-center py-12 text-gray-500">
+                        <p className="text-lg">No resources found for "{searchQuery || activeTag}".</p>
+                        <p className="text-sm mt-2">Try adjusting your search or be the first to share something!</p>
+                    </div>
+                ) : (
+                    filteredResources.map((resource, index) => (
+                        <ResourceCard
+                            key={resource.id}
+                            resource={resource}
+                            onClick={onResourceClick}
+                            onLike={handleLike}
+                            onUpvote={handleUpvote}
+                            onDownload={handleQuickDownload}
+                            index={index}
+                            userName={userName}
+                            onEdit={onEdit}
+                            onDelete={handleDelete}
+                        />
+                    ))
+                )}
+            </div>
+
+            {/* Map Widget - Bottom Right */}
+            <div className={`fixed bottom-8 right-8 z-40 transition-all duration-500 ${showMap ? 'w-[400px] h-[400px]' : 'w-16 h-16'}`}>
+                <div className="relative w-full h-full">
+                    {showMap && (
+                        <div className="absolute inset-0 rounded-3xl overflow-hidden shadow-2xl border-4 border-white animate-fade-in">
+                            <ResourceMap resources={filteredResources} onResourceClick={onResourceClick} />
                         </div>
-                    ) : (
-                        filteredResources.map((resource, index) => (
-                            <ResourceCard
-                                key={resource.id}
-                                resource={resource}
-                                onClick={onResourceClick}
-                                onLike={handleLike}
-                                onUpvote={handleUpvote}
-                                onDownload={handleQuickDownload}
-                                index={index}
-                                userName={userName}
-                                onEdit={onEdit}
-                                onDelete={handleDelete}
-                            />
-                        ))
                     )}
+                    <button
+                        onClick={() => setShowMap(!showMap)}
+                        className={`absolute bottom-0 right-0 w-16 h-16 rounded-full shadow-xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 ${showMap ? 'bg-white text-gray-900' : 'bg-indigo-600 text-white'}`}
+                        title="Toggle Map"
+                    >
+                        <span className="material-symbols-rounded text-3xl">{showMap ? 'close' : 'map'}</span>
+                    </button>
                 </div>
-            )}
+            </div>
         </div>
     );
 }

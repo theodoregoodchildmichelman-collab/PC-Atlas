@@ -59,42 +59,20 @@ function AppContent() {
 
           <div className="flex items-center gap-3">
             {/* Navigation Links */}
-            {/* View Toggle (Only on Feed) */}
-            {location.pathname === '/' && (
-              <div className="bg-gray-100 p-1 rounded-full border border-gray-200 flex shadow-inner">
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${viewMode === 'list'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-500 hover:text-gray-900'
-                    }`}
-                >
-                  List
-                </button>
-                <button
-                  onClick={() => setViewMode('map')}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${viewMode === 'map'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-500 hover:text-gray-900'
-                    }`}
-                >
-                  Map
-                </button>
-              </div>
-            )}
-            <div className="flex items-center gap-4">
+            {/* View Toggle (Only on Feed) - REMOVED as Map is now a widget */}
+
+            <div className="flex items-center gap-6">
               <Link
                 to="/my-saved-resources"
-                className="px-4 py-2 rounded-full bg-indigo-50 text-indigo-600 font-bold hover:bg-indigo-100 transition-colors flex items-center gap-2"
+                className="w-12 h-12 rounded-full bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 hover:scale-105 transition-all flex items-center justify-center shadow-sm"
+                title="Saved Resources"
               >
-                <span className="material-symbols-rounded">favorite</span>
-                Saved Items
+                <span className="material-symbols-rounded text-2xl">favorite</span>
               </Link>
               <button
                 onClick={() => setShowUpload(true)}
-                className="bg-gray-900 text-white px-6 py-3 rounded-full font-bold shadow-lg shadow-indigo-500/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
+                className="bg-gray-900 text-white px-8 py-3 rounded-full font-bold shadow-lg shadow-gray-900/20 hover:scale-105 active:scale-95 transition-all"
               >
-                <span className="material-symbols-rounded">add</span>
                 Share
               </button>
             </div>
