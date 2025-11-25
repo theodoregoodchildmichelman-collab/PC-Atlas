@@ -3,7 +3,7 @@ import { db, storage, auth } from '../firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
-export default function UploadForm({ onClose }) {
+export default function UploadForm({ onClose, userName }) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState(''); // New mandatory category
@@ -59,21 +59,19 @@ export default function UploadForm({ onClose }) {
         description,
         category, // Save main category
         tags: finalTags,
+        fileURL: downloadURL,
+        fileName: file.name,
+        fileSize: (file.size / (1024 * 1024)).toFixed(2),
         timeCommitment,
         cost,
         audience,
         location,
-        fileUrl: downloadURL,
-        fileName: file.name,
-        fileSize: (file.size / (1024 * 1024)).toFixed(2), // MB
-        fileType: file.type,
-        authorName: auth.currentUser ? 'Volunteer' : 'Anonymous', // Could be improved with user profiles
-        userId: auth.currentUser ? auth.currentUser.uid : 'anon',
         createdAt: serverTimestamp(),
-        downloadCount: 0,
+        userId: auth.currentUser.uid,
+        authorName: userName || 'Anonymous',
         likes: 0,
         likedBy: [],
-        upvotes: 0, // Initialize upvotes
+        upvotes: 0,
         upvotedBy: []
       });
 

@@ -165,10 +165,10 @@ export default function Feed({ onResourceClick, viewMode }) {
                             className="group bg-white p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-300 cursor-pointer hover:-translate-y-1 relative"
                             style={{ animationDelay: `${index * 50}ms` }}
                         >
-                            {/* Like Button - Top Right (Redesigned) */}
+                            {/* Like Button - Top Left (Moved) */}
                             <button
                                 onClick={(e) => handleLike(e, resource)}
-                                className="absolute top-6 right-6 p-2 rounded-lg bg-white/90 backdrop-blur-sm hover:bg-white shadow-sm border border-gray-100 transition-all z-10 group-hover:scale-110 active:scale-95 flex items-center justify-center w-10 h-10"
+                                className="absolute top-6 left-6 p-2 rounded-lg bg-white/90 backdrop-blur-sm hover:bg-white shadow-sm border border-gray-100 transition-all z-10 group-hover:scale-110 active:scale-95 flex items-center justify-center w-10 h-10"
                             >
                                 <span className="text-xl leading-none">
                                     {resource.likedBy?.includes(auth.currentUser?.uid) ? '❤️' : '🤍'}
@@ -237,8 +237,8 @@ export default function Feed({ onResourceClick, viewMode }) {
                                     <button
                                         onClick={(e) => handleUpvote(e, resource)}
                                         className={`flex items-center justify-center w-10 h-10 rounded-full transition-all ${resource.upvotedBy?.includes(auth.currentUser?.uid)
-                                                ? 'bg-orange-200 text-orange-700 shadow-inner'
-                                                : 'bg-orange-100 hover:bg-orange-200 text-orange-600'
+                                            ? 'bg-orange-200 text-orange-700 shadow-inner'
+                                            : 'bg-orange-100 hover:bg-orange-200 text-orange-600'
                                             }`}
                                         title="Upvote"
                                     >

@@ -4,6 +4,7 @@ import { signInAnonymously, onAuthStateChanged } from 'firebase/auth';
 import UploadForm from './components/UploadForm';
 import Feed from './components/Feed';
 import DetailModal from './components/DetailModal';
+import NameEntry from './components/NameEntry';
 
 /*
 FIRESTORE SCHEMA
@@ -12,6 +13,7 @@ FIRESTORE SCHEMA
 
 function App() {
   const [user, setUser] = useState(null);
+  const [userName, setUserName] = useState(localStorage.getItem('pc_atlas_username') || '');
   const [showUpload, setShowUpload] = useState(false);
   const [selectedResource, setSelectedResource] = useState(null);
   const [viewMode, setViewMode] = useState('list'); // 'list' or 'map'
@@ -28,6 +30,15 @@ function App() {
 
     return () => unsubscribe();
   }, []);
+
+  const handleNameSubmit = (name) => {
+    setUserName(name);
+    localStorage.setItem('pc_atlas_username', name);
+  };
+
+  if (!userName) {
+    return <NameEntry onComplete={handleNameSubmit} />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 text-gray-900 font-sans pb-20 selection:bg-indigo-100 selection:text-indigo-900">
@@ -81,8 +92,8 @@ function App() {
         <Feed onResourceClick={setSelectedResource} viewMode={viewMode} />
       </main>
 
-      {showUpload && <UploadForm onClose={() => setShowUpload(false)} />}
-      {selectedResource && <DetailModal resource={selectedResource} onClose={() => setSelectedResource(null)} />}
+      {showUpload && <UploadForm onClose={() => setShowUpload(false)} userName={userName} />}
+      {selectedResource && <DetailModal resource={selectedResource} onClose={() => setSelectedResource(null)} userName={userName} />}
     </div>
   );
 }

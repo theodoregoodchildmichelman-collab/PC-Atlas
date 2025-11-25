@@ -2,16 +2,16 @@ import { useState, useEffect } from 'react';
 import { db, auth } from '../firebase';
 import { collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from 'firebase/firestore';
 
-export default function DetailModal({ resource, onClose }) {
+export default function DetailModal({ resource, onClose, userName }) {
     const [comments, setComments] = useState([]);
-    const [newComment, setNewComment] = useState('');
+    const [comment, setComment] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
         if (!resource?.id) return;
 
         const q = query(
-            collection(db, `resources/${resource.id}/comments`),
+            collection(db, 'resources', resource.id, 'comments'),
             orderBy('createdAt', 'desc')
         );
 
@@ -36,17 +36,17 @@ export default function DetailModal({ resource, onClose }) {
 
     const handleSubmitComment = async (e) => {
         e.preventDefault();
-        if (!newComment.trim()) return;
+        if (!comment.trim()) return;
 
         setIsSubmitting(true);
         try {
-            await addDoc(collection(db, `resources/${resource.id}/comments`), {
-                text: newComment,
-                authorName: auth.currentUser ? 'Volunteer' : 'Anonymous',
-                userId: auth.currentUser ? auth.currentUser.uid : 'anon',
-                createdAt: serverTimestamp()
+            await addDoc(collection(db, 'resources', resource.id, 'comments'), {
+                text: comment,
+                createdAt: serverTimestamp(),
+                userId: auth.currentUser?.uid,
+                authorName: userName || 'Anonymous'
             });
-            setNewComment('');
+            setComment('');
         } catch (error) {
             console.error("Error adding comment:", error);
         } finally {
@@ -88,28 +88,28 @@ export default function DetailModal({ resource, onClose }) {
                                 ))}
                             </div>
 
-                            <div className="mt-6 flex flex-wrap gap-3">
+                            <div className="flex flex-wrap gap-4 mb-8 mt-6">
                                 {resource.timeCommitment && (
                                     <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg border border-gray-100">
                                         <span className="material-symbols-rounded text-indigo-500">schedule</span>
-                                        <span className="font-medium">Time:</span> {resource.timeCommitment}
+                                        <span className="font-bold text-purple-600">Time:</span> {resource.timeCommitment}
                                     </div>
                                 )}
                                 {resource.cost && (
                                     <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg border border-gray-100">
                                         <span className="material-symbols-rounded text-emerald-500">savings</span>
-                                        <span className="font-medium">Cost:</span> {resource.cost}
+                                        <span className="font-bold text-green-600">Cost:</span> {resource.cost}
                                     </div>
                                 )}
                                 {resource.audience && (
                                     <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg border border-gray-100">
                                         <span className="material-symbols-rounded text-blue-500">group</span>
-                                        <span className="font-medium">Audience:</span> {resource.audience}
+                                        <span className="font-medium text-blue-600 capitalize">Group:</span> {resource.audience}
                                     </div>
                                 )}
                                 {resource.location && (
                                     <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg border border-gray-100">
-                                        {resource.location}
+                                        <span className="font-bold text-red-600">Location:</span> {resource.location}
                                     </div>
                                 )}
                             </div>
@@ -168,13 +168,13 @@ export default function DetailModal({ resource, onClose }) {
                                     type="text"
                                     placeholder="Type a message..."
                                     className="flex-1 px-4 py-2.5 rounded-full border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 text-sm transition-all outline-none bg-gray-50 focus:bg-white"
-                                    value={newComment}
-                                    onChange={(e) => setNewComment(e.target.value)}
+                                    value={comment}
+                                    onChange={(e) => setComment(e.target.value)}
                                     disabled={isSubmitting}
                                 />
                                 <button
                                     type="submit"
-                                    disabled={isSubmitting || !newComment.trim()}
+                                    disabled={isSubmitting || !comment.trim()}
                                     className="p-2.5 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 active:scale-95 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                                 >
                                     <span className="material-symbols-rounded text-xl">send</span>
