@@ -45,7 +45,7 @@ function App() {
       <header className="glass sticky top-0 z-10 transition-all duration-300">
         <div className="max-w-3xl mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-600 tracking-tight flex items-center gap-2">
-            Мировен Корпус Атлас
+            Мировен Корпус Атлас {/* v1.1 */}
           </h1>
 
           <div className="flex items-center gap-3">
