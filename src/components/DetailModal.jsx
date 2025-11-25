@@ -109,35 +109,20 @@ export default function DetailModal({ resource, onClose }) {
                                 )}
                                 {resource.location && (
                                     <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg border border-gray-100">
-                                        <span className="material-symbols-rounded text-red-500">location_on</span>
-                                        <span className="font-medium">Location:</span> {resource.location}
+                                        {resource.location}
                                     </div>
                                 )}
                             </div>
                         </div>
 
-                        <div className="bg-gray-50 rounded-2xl p-6 mb-10 border border-gray-100">
-                            <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                                <span className="material-symbols-rounded text-indigo-600">attach_file</span>
-                                File Preview
-                            </h3>
-                            <div className="flex items-center gap-4 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                                <div className="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center text-red-500">
-                                    <span className="material-symbols-rounded text-3xl">description</span>
-                                </div>
-                                <div className="overflow-hidden">
-                                    <p className="font-semibold text-gray-900 truncate">{resource.fileName || 'Document'}</p>
-                                    <p className="text-xs text-gray-500 font-medium">{resource.fileSize ? `${resource.fileSize} MB` : 'Unknown Size'}</p>
-                                </div>
-                            </div>
-                        </div>
+                        {/* File Preview Removed */}
 
                         <button
                             onClick={handleDownload}
                             className="w-full bg-indigo-600 text-white font-bold py-4 rounded-xl hover:bg-indigo-700 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-indigo-500/30 flex items-center justify-center gap-3 text-lg"
                         >
                             <span className="material-symbols-rounded">download</span>
-                            Download File
+                            Download
                         </button>
                     </div>
 

@@ -6,6 +6,7 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 export default function UploadForm({ onClose }) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [category, setCategory] = useState(''); // New mandatory category
   const [tags, setTags] = useState([]);
   const [currentTag, setCurrentTag] = useState('');
   const [file, setFile] = useState(null);
@@ -15,6 +16,8 @@ export default function UploadForm({ onClose }) {
   const [cost, setCost] = useState('Free (0 MKD)');
   const [audience, setAudience] = useState('Mixed Group');
   const [location, setLocation] = useState('Skopje');
+
+  const categories = ['Camps', 'Clubs', 'EE Lesson Plans', 'CD Resources']; // Main categories
 
   const locations = [
     'Skopje', 'Bitola', 'Tetovo', 'Stip', 'Prilep', 'Ohrid', 'Kumanovo', 'Veles',
@@ -38,7 +41,7 @@ export default function UploadForm({ onClose }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!file) return;
+    if (!file || !category) return; // Validate category
 
     setIsUploading(true);
     try {
@@ -47,11 +50,15 @@ export default function UploadForm({ onClose }) {
       const snapshot = await uploadBytes(fileRef, file);
       const downloadURL = await getDownloadURL(snapshot.ref);
 
+      // Ensure category is included in tags for filtering
+      const finalTags = tags.includes(category) ? tags : [category, ...tags];
+
       // 2. Save Metadata to Firestore
       await addDoc(collection(db, 'resources'), {
         title,
         description,
-        tags,
+        category, // Save main category
+        tags: finalTags,
         timeCommitment,
         cost,
         audience,
@@ -63,7 +70,11 @@ export default function UploadForm({ onClose }) {
         authorName: auth.currentUser ? 'Volunteer' : 'Anonymous', // Could be improved with user profiles
         userId: auth.currentUser ? auth.currentUser.uid : 'anon',
         createdAt: serverTimestamp(),
-        downloadCount: 0
+        downloadCount: 0,
+        likes: 0,
+        likedBy: [],
+        upvotes: 0, // Initialize upvotes
+        upvotedBy: []
       });
 
       console.log("Upload successful!");
@@ -78,7 +89,7 @@ export default function UploadForm({ onClose }) {
 
   return (
     <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
-      <div className="bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl animate-slide-up border border-white/50 max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl animate-slide-up border border-white/50 max-h-[90vh] overflow-y-auto">
         <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50 sticky top-0 z-10 backdrop-blur-md">
           <h2 className="text-xl font-bold text-gray-900 tracking-tight">Share Resource</h2>
           <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-400 hover:text-gray-600">
@@ -100,60 +111,78 @@ export default function UploadForm({ onClose }) {
             />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Time Commitment</label>
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Category (Required)</label>
+            <select
+              required
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none appearance-none"
+              disabled={isUploading}
+            >
+              <option value="" disabled>Select a category...</option>
+              {categories.map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Compact Layout: Time, Cost, Audience in one row */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Time</label>
               <select
                 value={timeCommitment}
                 onChange={(e) => setTimeCommitment(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none appearance-none"
+                className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none appearance-none text-sm"
                 disabled={isUploading}
               >
                 <option>Quick (&lt; 1 hour)</option>
                 <option>Medium (Half-day)</option>
-                <option>High (Multi-day project)</option>
+                <option>High (Multi-day)</option>
               </select>
             </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Cost Estimate</label>
+            <div className="flex-1">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Cost</label>
               <select
                 value={cost}
                 onChange={(e) => setCost(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none appearance-none"
+                className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none appearance-none text-sm"
                 disabled={isUploading}
               >
                 <option>Free (0 MKD)</option>
-                <option>Low Cost (Self-funded)</option>
+                <option>Low Cost</option>
                 <option>Grant Required</option>
               </select>
             </div>
-            <div className="sm:col-span-2">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Target Audience</label>
+            <div className="flex-1">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Target Group</label>
               <select
                 value={audience}
                 onChange={(e) => setAudience(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none appearance-none"
+                className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none appearance-none text-sm"
                 disabled={isUploading}
               >
                 <option>Primary School</option>
                 <option>High School</option>
-                <option>Adults / Community</option>
+                <option>Adults</option>
                 <option>Mixed Group</option>
               </select>
             </div>
-            <div className="sm:col-span-2">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Location (City/Village)</label>
-              <select
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none appearance-none"
-                disabled={isUploading}
-              >
-                {locations.map(loc => (
-                  <option key={loc} value={loc}>{loc}</option>
-                ))}
-              </select>
-            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Location (City/Village)</label>
+            <select
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none appearance-none"
+              disabled={isUploading}
+            >
+              {locations.map(loc => (
+                <option key={loc} value={loc}>{loc}</option>
+              ))}
+            </select>
           </div>
 
           <div>
@@ -170,7 +199,7 @@ export default function UploadForm({ onClose }) {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Tags (Press Enter)</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Tags (Optional)</label>
             <div className="flex flex-wrap gap-2 mb-3">
               {tags.map(tag => (
                 <span key={tag} className="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-lg text-sm font-medium flex items-center gap-2 animate-fade-in">
@@ -182,7 +211,7 @@ export default function UploadForm({ onClose }) {
             <input
               type="text"
               className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none"
-              placeholder="Add tags (e.g., Camps, English)..."
+              placeholder="Add tags (e.g., English, Science)..."
               value={currentTag}
               onChange={(e) => setCurrentTag(e.target.value)}
               onKeyDown={handleAddTag}
@@ -201,6 +230,14 @@ export default function UploadForm({ onClose }) {
                 disabled={isUploading}
               />
             </div>
+            {/* Simple File Info - No Preview */}
+            {file && (
+              <div className="mt-2 text-sm text-gray-600 flex items-center gap-2">
+                <span className="material-symbols-rounded text-indigo-500">description</span>
+                <span className="font-medium">{file.name}</span>
+                <span className="text-gray-400">({(file.size / (1024 * 1024)).toFixed(2)} MB)</span>
+              </div>
+            )}
           </div>
 
           <button

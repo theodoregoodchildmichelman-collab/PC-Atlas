@@ -36,12 +36,17 @@ const cityCoordinates = {
     'Sveti Nikole': [41.8650, 21.9422]
 };
 
-export default function ResourceMap({ resources, onResourceClick }) {
-    // Group resources by location to handle multiple resources at same spot (optional, but good for future)
-    // For now, we'll just map them. If multiple resources are in same city, they will overlap.
-    // A better approach for MVP is to slightly offset them or just let them overlap.
-    // Let's just map them for now.
+// Custom Red Icon
+const redIcon = new L.Icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+});
 
+export default function ResourceMap({ resources, onResourceClick }) {
     const validResources = resources.filter(r => r.location && cityCoordinates[r.location]);
 
     return (
@@ -60,6 +65,7 @@ export default function ResourceMap({ resources, onResourceClick }) {
                     <Marker
                         key={resource.id}
                         position={cityCoordinates[resource.location]}
+                        icon={redIcon}
                     >
                         <Popup>
                             <div className="min-w-[200px]">
