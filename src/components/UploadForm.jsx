@@ -1,12 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { db, storage, auth } from '../firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, doc, serverTimestamp } from 'firebase/firestore';
 
-export default function UploadForm({ onClose, userName }) {
+export default function UploadForm({ onClose, userName, initialData }) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [category, setCategory] = useState(''); // New mandatory category
+  const [category, setCategory] = useState('');
   const [tags, setTags] = useState([]);
   const [currentTag, setCurrentTag] = useState('');
   const [file, setFile] = useState(null);
@@ -17,7 +17,22 @@ export default function UploadForm({ onClose, userName }) {
   const [audience, setAudience] = useState('Mixed Group');
   const [location, setLocation] = useState('Skopje');
 
-  const categories = ['Camps', 'Clubs', 'EE Lesson Plans', 'CD Resources']; // Main categories
+  // Pre-fill data if editing
+  useEffect(() => {
+    if (initialData) {
+      setTitle(initialData.title || '');
+      setDescription(initialData.description || '');
+      setCategory(initialData.category || '');
+      setTags(initialData.tags || []);
+      setTimeCommitment(initialData.timeCommitment || 'Quick (< 1 hour)');
+      setCost(initialData.cost || 'Free (0 MKD)');
+      setAudience(initialData.audience || 'Mixed Group');
+      setLocation(initialData.location || 'Skopje');
+      // File is optional when editing
+    }
+  }, [initialData]);
+
+  const categories = ['Camps', 'Clubs', 'EE Lesson Plans', 'CD Resources'];
 
   const locations = [
     'Skopje', 'Bitola', 'Tetovo', 'Stip', 'Prilep', 'Ohrid', 'Kumanovo', 'Veles',
@@ -41,45 +56,66 @@ export default function UploadForm({ onClose, userName }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!file || !category) return; // Validate category
+    if (!category) return;
+    if (!initialData && !file) return; // File required only for new uploads
 
     setIsUploading(true);
     try {
-      // 1. Upload File to Storage
-      const fileRef = ref(storage, `resources/${Date.now()}_${file.name}`);
-      const snapshot = await uploadBytes(fileRef, file);
-      const downloadURL = await getDownloadURL(snapshot.ref);
+      let downloadURL = initialData?.fileURL;
+      let fileName = initialData?.fileName;
+      let fileSize = initialData?.fileSize;
 
-      // Ensure category is included in tags for filtering
+      // 1. Upload File to Storage (if new file selected)
+      if (file) {
+        const fileRef = ref(storage, `resources/${Date.now()}_${file.name}`);
+        const snapshot = await uploadBytes(fileRef, file);
+        downloadURL = await getDownloadURL(snapshot.ref);
+        fileName = file.name;
+        fileSize = (file.size / (1024 * 1024)).toFixed(2);
+      }
+
+      // Ensure category is included in tags
       const finalTags = tags.includes(category) ? tags : [category, ...tags];
 
-      // 2. Save Metadata to Firestore
-      await addDoc(collection(db, 'resources'), {
+      const resourceData = {
         title,
         description,
-        category, // Save main category
+        category,
         tags: finalTags,
         fileURL: downloadURL,
-        fileName: file.name,
-        fileSize: (file.size / (1024 * 1024)).toFixed(2),
+        fileName: fileName,
+        fileSize: fileSize,
         timeCommitment,
         cost,
         audience,
         location,
-        createdAt: serverTimestamp(),
-        userId: auth.currentUser.uid,
-        authorName: userName || 'Anonymous',
-        likes: 0,
-        likedBy: [],
-        upvotes: 0,
-        upvotedBy: []
-      });
+        // Don't update createdAt, userId, authorName, likes, etc. on edit
+      };
 
-      console.log("Upload successful!");
+      if (initialData) {
+        // Update existing doc
+        const resourceRef = doc(db, 'resources', initialData.id);
+        await updateDoc(resourceRef, resourceData);
+        console.log("Update successful!");
+      } else {
+        // Create new doc
+        await addDoc(collection(db, 'resources'), {
+          ...resourceData,
+          createdAt: serverTimestamp(),
+          userId: auth.currentUser.uid,
+          authorName: userName || 'Anonymous',
+          likes: 0,
+          likedBy: [],
+          upvotes: 0,
+          upvotedBy: []
+        });
+        console.log("Upload successful!");
+      }
+
       onClose();
     } catch (error) {
-      console.error("Error uploading resource:", error);
-      alert("Failed to upload. Please try again.");
+      console.error("Error saving resource:", error);
+      alert("Failed to save. Please try again.");
     } finally {
       setIsUploading(false);
     }
@@ -89,7 +125,7 @@ export default function UploadForm({ onClose, userName }) {
     <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
       <div className="bg-white rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl animate-slide-up border border-white/50 max-h-[90vh] overflow-y-auto">
         <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50 sticky top-0 z-10 backdrop-blur-md">
-          <h2 className="text-xl font-bold text-gray-900 tracking-tight">Share Resource</h2>
+          <h2 className="text-xl font-bold text-gray-900 tracking-tight">{initialData ? 'Edit Resource' : 'Share Resource'}</h2>
           <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-400 hover:text-gray-600">
             <span className="material-symbols-rounded">close</span>
           </button>
@@ -125,7 +161,6 @@ export default function UploadForm({ onClose, userName }) {
             </select>
           </div>
 
-          {/* Compact Layout: Time, Cost, Audience in one row */}
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
               <label className="block text-sm font-semibold text-gray-700 mb-2">Time</label>
@@ -218,22 +253,22 @@ export default function UploadForm({ onClose, userName }) {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">File</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">File {initialData ? '(Optional - leave empty to keep existing)' : ''}</label>
             <div className="relative group">
               <input
                 type="file"
-                required
+                required={!initialData}
                 className="w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition-all cursor-pointer border border-gray-200 rounded-xl p-2"
                 onChange={(e) => setFile(e.target.files[0])}
                 disabled={isUploading}
               />
             </div>
-            {/* Simple File Info - No Preview */}
-            {file && (
+            {/* Simple File Info */}
+            {(file || initialData?.fileName) && (
               <div className="mt-2 text-sm text-gray-600 flex items-center gap-2">
                 <span className="material-symbols-rounded text-indigo-500">description</span>
-                <span className="font-medium">{file.name}</span>
-                <span className="text-gray-400">({(file.size / (1024 * 1024)).toFixed(2)} MB)</span>
+                <span className="font-medium">{file ? file.name : initialData.fileName}</span>
+                <span className="text-gray-400">({file ? (file.size / (1024 * 1024)).toFixed(2) : initialData.fileSize} MB)</span>
               </div>
             )}
           </div>
@@ -249,10 +284,10 @@ export default function UploadForm({ onClose, userName }) {
             {isUploading ? (
               <>
                 <span className="material-symbols-rounded animate-spin">progress_activity</span>
-                Uploading...
+                {initialData ? 'Updating...' : 'Uploading...'}
               </>
             ) : (
-              "Upload Resource"
+              initialData ? 'Update Resource' : 'Upload Resource'
             )}
           </button>
         </form>
