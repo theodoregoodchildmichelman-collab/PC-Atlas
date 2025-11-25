@@ -88,29 +88,30 @@ export default function DetailModal({ resource, onClose, userName }) {
                                 ))}
                             </div>
 
-                            <div className="flex flex-wrap gap-4 mb-8 mt-6">
+                            <div className="flex flex-wrap gap-3 mb-6">
                                 {resource.timeCommitment && (
-                                    <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg border border-gray-100">
-                                        <span className="material-symbols-rounded text-indigo-500">schedule</span>
-                                        <span className="font-bold text-purple-600">Time:</span> {resource.timeCommitment}
-                                    </div>
+                                    <span className="inline-flex items-center gap-1 text-sm text-gray-700 bg-purple-50 px-3 py-1.5 rounded-lg border border-purple-100">
+                                        <span className="material-symbols-rounded text-purple-500 text-lg">schedule</span>
+                                        {resource.timeCommitment.split(' ')[0]}
+                                    </span>
                                 )}
                                 {resource.cost && (
-                                    <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg border border-gray-100">
-                                        <span className="material-symbols-rounded text-emerald-500">savings</span>
-                                        <span className="font-bold text-green-600">Cost:</span> {resource.cost}
-                                    </div>
+                                    <span className="inline-flex items-center gap-1 text-sm text-gray-700 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-100">
+                                        <span className="material-symbols-rounded text-emerald-500 text-lg">savings</span>
+                                        {resource.cost.split(' ')[0]}
+                                    </span>
                                 )}
                                 {resource.audience && (
-                                    <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg border border-gray-100">
-                                        <span className="material-symbols-rounded text-blue-500">group</span>
-                                        <span className="font-medium text-blue-600 capitalize">Group:</span> {resource.audience}
-                                    </div>
+                                    <span className="inline-flex items-center gap-1 text-sm text-gray-700 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100">
+                                        <span className="material-symbols-rounded text-blue-500 text-lg">group</span>
+                                        {resource.audience}
+                                    </span>
                                 )}
                                 {resource.location && (
-                                    <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg border border-gray-100">
-                                        <span className="font-bold text-red-600">Location:</span> {resource.location}
-                                    </div>
+                                    <span className="inline-flex items-center gap-1 text-sm text-gray-700 bg-red-50 px-3 py-1.5 rounded-lg border border-red-100">
+                                        <span className="material-symbols-rounded text-red-500 text-lg">location_on</span>
+                                        {resource.location}
+                                    </span>
                                 )}
                             </div>
                         </div>

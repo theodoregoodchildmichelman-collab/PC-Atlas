@@ -59,13 +59,6 @@ function AppContent() {
 
           <div className="flex items-center gap-3">
             {/* Navigation Links */}
-            <Link
-              to="/my-saved-resources"
-              className={`text-sm font-medium transition-colors ${location.pathname === '/my-saved-resources' ? 'text-indigo-600 font-bold' : 'text-gray-600 hover:text-indigo-600'}`}
-            >
-              Saved Items
-            </Link>
-
             {/* View Toggle (Only on Feed) */}
             {location.pathname === '/' && (
               <div className="bg-gray-100 p-1 rounded-full border border-gray-200 flex shadow-inner">
@@ -89,13 +82,22 @@ function AppContent() {
                 </button>
               </div>
             )}
-
-            <button
-              onClick={() => setShowUpload(true)}
-              className="bg-gray-900 text-white px-5 py-2.5 rounded-full font-medium text-sm hover:bg-gray-800 hover:scale-105 active:scale-95 transition-all shadow-lg shadow-indigo-500/20 flex items-center gap-2"
-            >
-              Share
-            </button>
+            <div className="flex items-center gap-4">
+              <Link
+                to="/my-saved-resources"
+                className="px-4 py-2 rounded-full bg-indigo-50 text-indigo-600 font-bold hover:bg-indigo-100 transition-colors flex items-center gap-2"
+              >
+                <span className="material-symbols-rounded">favorite</span>
+                Saved Items
+              </Link>
+              <button
+                onClick={() => setShowUpload(true)}
+                className="bg-gray-900 text-white px-6 py-3 rounded-full font-bold shadow-lg shadow-indigo-500/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
+              >
+                <span className="material-symbols-rounded">add</span>
+                Share
+              </button>
+            </div>
           </div>
         </div>
       </header>

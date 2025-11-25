@@ -8,6 +8,10 @@ vi.mock('./ResourceCard', () => ({
     default: ({ resource }) => <div data-testid="resource-card">{resource.title}</div>
 }));
 
+vi.mock('./ResourceMap', () => ({
+    default: () => <div data-testid="resource-map">Map View</div>
+}));
+
 vi.mock('./FilterSidebar', () => ({
     default: ({ filters, onFilterChange }) => (
         <div data-testid="filter-sidebar">
@@ -44,14 +48,7 @@ describe('Feed Filtering', () => {
         });
     });
 
-    // Note: Testing the actual filtering logic inside Feed is tricky because it's internal state.
-    // However, we can test the effect of the filter change.
-    // Since we mocked FilterSidebar, we can simulate a filter change.
-
-    // Wait, Feed.jsx implements the filtering logic *inside* the component based on `filters` state.
-    // If we trigger the `onFilterChange` prop passed to `FilterSidebar`, `Feed` should update.
-
-    it('filters resources when filter is applied', async () => {
+    it('filters resources using smart search', async () => {
         render(<Feed userName="TestUser" />);
 
         // Wait for initial load
@@ -59,10 +56,37 @@ describe('Feed Filtering', () => {
             expect(screen.getByText('Free Resource')).toBeInTheDocument();
         });
 
-        // Click the mock filter button
-        fireEvent.click(screen.getByText('Filter Free'));
+        // Type "cheap" into search bar
+        const searchInput = screen.getByPlaceholderText(/Search resources/i);
+        fireEvent.change(searchInput, { target: { value: 'cheap' } });
 
-        // Should show Free Resource, should NOT show Paid Resource
+        // Should show Free Resource (smart match for "cheap"), should NOT show Paid Resource
+        await waitFor(() => {
+            expect(screen.getByText('Free Resource')).toBeInTheDocument();
+            expect(screen.queryByText('Paid Resource')).not.toBeInTheDocument();
+        });
+    });
+
+    // Note: Testing the actual filtering logic inside Feed is tricky because it's internal state.
+    // However, we can test the effect of the filter change.
+    // Since we mocked FilterSidebar, we can simulate a filter change.
+
+    // Wait, Feed.jsx implements the filtering logic *inside* the component based on `filters` state.
+    // If we trigger the `onFilterChange` prop passed to `FilterSidebar`, `Feed` should update.
+
+    it('filters resources using smart search', async () => {
+        render(<Feed userName="TestUser" />);
+
+        // Wait for initial load
+        await waitFor(() => {
+            expect(screen.getByText('Free Resource')).toBeInTheDocument();
+        });
+
+        // Type "cheap" into search bar
+        const searchInput = screen.getByPlaceholderText(/Search resources/i);
+        fireEvent.change(searchInput, { target: { value: 'cheap' } });
+
+        // Should show Free Resource (smart match for "cheap"), should NOT show Paid Resource
         await waitFor(() => {
             expect(screen.getByText('Free Resource')).toBeInTheDocument();
             expect(screen.queryByText('Paid Resource')).not.toBeInTheDocument();
