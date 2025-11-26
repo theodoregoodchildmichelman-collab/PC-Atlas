@@ -2,14 +2,6 @@ import React, { useState } from 'react';
 import { auth } from '../firebase';
 
 export default function ResourceCard({ resource, onClick, onLike, onUpvote, onDownload, index, userName, onEdit, onDelete }) {
-    const isNew = () => {
-        if (!resource.createdAt) return false;
-        const createdDate = resource.createdAt.toDate ? resource.createdAt.toDate() : new Date(resource.createdAt);
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-        return createdDate > sevenDaysAgo;
-    };
-
     // Local state for heart to ensure instant feedback and privacy
     const [isLiked, setIsLiked] = useState(resource.likedBy?.includes(auth.currentUser?.uid) || false);
 
@@ -25,12 +17,7 @@ export default function ResourceCard({ resource, onClick, onLike, onUpvote, onDo
             className="group bg-white p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-300 cursor-pointer hover:-translate-y-1 relative h-full flex flex-col"
             style={{ animationDelay: `${index * 50}ms` }}
         >
-            {/* New Badge */}
-            {isNew() && (
-                <div className="absolute top-4 right-4 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full shadow-md z-10">
-                    NEW
-                </div>
-            )}
+
 
             {/* Like Button (Heart) - Top Left, Small Gray Emoji */}
             <button
@@ -144,6 +131,6 @@ export default function ResourceCard({ resource, onClick, onLike, onUpvote, onDo
                     </button>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }

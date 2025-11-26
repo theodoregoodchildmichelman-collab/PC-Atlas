@@ -66,7 +66,7 @@ describe('Feed Filtering', () => {
         });
 
         // Type "cheap" into search bar
-        const searchInput = screen.getByPlaceholderText(/Search something, find anything/i);
+        const searchInput = screen.getByRole('textbox');
         fireEvent.change(searchInput, { target: { value: 'cheap' } });
 
         // Should show Free Resource (smart match for "cheap"), should NOT show Paid Resource

@@ -17,6 +17,35 @@ export default function UploadForm({ onClose, userName, initialData }) {
   const [cost, setCost] = useState('Free (0 MKD)');
   const [audience, setAudience] = useState('Mixed Group');
   const [location, setLocation] = useState('Skopje');
+  const [coordinates, setCoordinates] = useState(null); // Add coordinates state
+  const [locationQuery, setLocationQuery] = useState(''); // Add locationQuery state
+  const [showLocationSuggestions, setShowLocationSuggestions] = useState(false); // Add suggestions state
+  const [filteredLocations, setFilteredLocations] = useState([]); // Add filtered locations state
+
+  const handleLocationChange = (e) => {
+    const value = e.target.value;
+    setLocationQuery(value);
+    // setLocation(value); // Don't set location yet, wait for select? Or allow free text?
+    // Let's allow free text but prefer selection.
+    setLocation(value);
+
+    if (value.length > 0) {
+      const filtered = MKD_LOCATIONS.filter(loc =>
+        loc.name.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredLocations(filtered);
+      setShowLocationSuggestions(true);
+    } else {
+      setShowLocationSuggestions(false);
+    }
+  };
+
+  const handleLocationSelect = (loc) => {
+    setLocationQuery(loc.name);
+    setLocation(loc.name);
+    setCoordinates(new GeoPoint(loc.lat, loc.lng));
+    setShowLocationSuggestions(false);
+  };
 
   // Pre-fill data if editing
   useEffect(() => {
