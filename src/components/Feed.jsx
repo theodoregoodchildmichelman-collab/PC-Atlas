@@ -307,23 +307,28 @@ export default function Feed({ onResourceClick, viewMode, userName, onEdit }) {
                 )}
             </div>
 
-            {/* Map Widget - Bottom Right */}
-            <div className={`fixed bottom-8 right-8 z-40 transition-all duration-500 ${showMap ? 'w-[400px] h-[400px]' : 'w-16 h-16'}`}>
+            {/* Map Widget - Resizable & Toggleable */}
+            <div className={`fixed bottom-8 right-8 z-40 transition-all duration-500 ease-in-out shadow-2xl rounded-3xl overflow-hidden border-4 border-white ${showMap ? 'w-[90vw] h-[320px] sm:w-[400px] sm:h-[400px] opacity-100 translate-y-0' : 'w-16 h-16 opacity-0 translate-y-10 pointer-events-none'}`}>
                 <div className="relative w-full h-full">
-                    {showMap && (
-                        <div className="absolute inset-0 rounded-3xl overflow-hidden shadow-2xl border-4 border-white animate-fade-in">
-                            <ResourceMap resources={filteredResources} onResourceClick={onResourceClick} />
-                        </div>
-                    )}
+                    <ResourceMap resources={filteredResources} />
                     <button
-                        onClick={() => setShowMap(!showMap)}
-                        className={`absolute bottom-0 right-0 w-16 h-16 rounded-full shadow-xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 ${showMap ? 'bg-white text-gray-900' : 'bg-indigo-600 text-white'}`}
-                        title="Toggle Map"
+                        onClick={() => setShowMap(false)}
+                        className="absolute top-4 right-4 bg-white text-gray-900 p-2 rounded-full shadow-md hover:bg-gray-100 transition-colors z-[1000]"
                     >
-                        <span className="material-symbols-rounded text-3xl">{showMap ? 'close' : 'map'}</span>
+                        <span className="material-symbols-rounded text-xl">close</span>
                     </button>
                 </div>
             </div>
+
+            {/* Floating Map Toggle Button (FAB) */}
+            {!showMap && (
+                <button
+                    onClick={() => setShowMap(true)}
+                    className="fixed bottom-8 right-8 bg-gray-900 text-white p-4 rounded-full shadow-lg hover:scale-110 active:scale-95 transition-all z-40 flex items-center justify-center group"
+                >
+                    <span className="material-symbols-rounded text-2xl group-hover:animate-pulse">map</span>
+                </button>
+            )}
         </div>
     );
 }
