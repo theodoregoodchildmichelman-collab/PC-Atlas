@@ -214,12 +214,12 @@ export default function Feed({ onResourceClick, viewMode, userName, onEdit }) {
                 <div className="relative w-full max-w-2xl mx-auto">
                     <input
                         type="text"
-                        placeholder="Search something, find anything..."
+                        placeholder="Search something, find anything"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-12 pr-4 py-4 rounded-full bg-white border border-gray-200 shadow-sm focus:shadow-md focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all outline-none text-lg"
+                        className="w-full pl-12 pr-4 py-4 rounded-full bg-white border border-gray-200 shadow-sm focus:shadow-md focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all outline-none text-lg placeholder:text-gray-400"
                     />
-                    <span className="material-symbols-rounded absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-2xl">search</span>
+                    <span className="material-symbols-rounded absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-2xl pointer-events-none">search</span>
                 </div>
 
                 {/* Categories & Filters */}

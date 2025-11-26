@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { db, storage, auth } from '../firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { collection, addDoc, updateDoc, doc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, doc, serverTimestamp, GeoPoint } from 'firebase/firestore';
+import { MKD_LOCATIONS } from '../data/locations';
 
 export default function UploadForm({ onClose, userName, initialData }) {
   const [title, setTitle] = useState('');
@@ -89,6 +90,7 @@ export default function UploadForm({ onClose, userName, initialData }) {
         cost,
         audience,
         location,
+        coordinates: coordinates || null, // Include coordinates
         // Don't update createdAt, userId, authorName, likes, etc. on edit
       };
 
@@ -206,16 +208,32 @@ export default function UploadForm({ onClose, userName, initialData }) {
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Location (City/Village)</label>
-            <select
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none appearance-none"
-              disabled={isUploading}
-            >
-              {locations.map(loc => (
-                <option key={loc} value={loc}>{loc}</option>
-              ))}
-            </select>
+            <div className="relative">
+              <input
+                type="text"
+                className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none"
+                placeholder="Start typing a city..."
+                value={locationQuery}
+                onChange={handleLocationChange}
+                onFocus={() => locationQuery && setShowLocationSuggestions(true)}
+                onBlur={() => setTimeout(() => setShowLocationSuggestions(false), 100)} // Delay to allow click on suggestion
+                disabled={isUploading}
+              />
+              {showLocationSuggestions && filteredLocations.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto z-50">
+                  {filteredLocations.map((loc) => (
+                    <button
+                      key={loc.name}
+                      type="button"
+                      onClick={() => handleLocationSelect(loc)}
+                      className="w-full text-left px-4 py-2 hover:bg-indigo-50 transition-colors text-sm text-gray-700"
+                    >
+                      {loc.name}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           <div>

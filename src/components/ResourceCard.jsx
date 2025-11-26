@@ -32,13 +32,13 @@ export default function ResourceCard({ resource, onClick, onLike, onUpvote, onDo
                 </div>
             )}
 
-            {/* Like Button (Heart) - Top Left */}
+            {/* Like Button (Heart) - Top Left, Small Gray Emoji */}
             <button
                 onClick={handleHeartClick}
-                className="absolute top-4 left-4 p-2 rounded-full hover:bg-red-50 transition-colors z-10"
+                className="absolute top-4 left-4 p-1 rounded-full hover:bg-gray-100 transition-colors z-10"
             >
-                <span className={`material-symbols-rounded text-3xl transition-colors ${isLiked ? 'text-red-500 fill-current' : 'text-gray-300'}`}>
-                    favorite
+                <span className="text-xl leading-none grayscale opacity-80 hover:opacity-100 hover:grayscale-0 transition-all">
+                    {isLiked ? '❤️' : '🤍'}
                 </span>
                 {resource.likes > 0 && (
                     <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full shadow-sm border-2 border-white">
