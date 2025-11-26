@@ -64,10 +64,10 @@ function AppContent() {
             <div className="flex items-center gap-6">
               <Link
                 to="/my-saved-resources"
-                className="w-12 h-12 rounded-full bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 hover:scale-105 transition-all flex items-center justify-center shadow-sm"
+                className="bg-red-600 text-white px-8 py-3 rounded-full font-bold shadow-lg shadow-red-600/20 hover:scale-105 active:scale-95 transition-all flex items-center justify-center"
                 title="Saved Resources"
               >
-                <span className="material-symbols-rounded text-2xl">favorite</span>
+                Favorite
               </Link>
               <button
                 onClick={() => setShowUpload(true)}

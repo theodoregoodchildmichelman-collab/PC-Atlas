@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { auth } from '../firebase';
 
 export default function ResourceCard({ resource, onClick, onLike, onUpvote, onDownload, index, userName, onEdit, onDelete }) {
@@ -7,6 +8,15 @@ export default function ResourceCard({ resource, onClick, onLike, onUpvote, onDo
         const sevenDaysAgo = new Date();
         sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
         return createdDate > sevenDaysAgo;
+    };
+
+    // Local state for heart to ensure instant feedback and privacy
+    const [isLiked, setIsLiked] = useState(resource.likedBy?.includes(auth.currentUser?.uid) || false);
+
+    const handleHeartClick = (e) => {
+        e.stopPropagation();
+        setIsLiked(!isLiked); // Instant toggle
+        onLike(e, resource); // Persist
     };
 
     return (
@@ -22,13 +32,13 @@ export default function ResourceCard({ resource, onClick, onLike, onUpvote, onDo
                 </div>
             )}
 
-            {/* Like Button - Top Left */}
+            {/* Like Button (Heart) - Top Left */}
             <button
-                onClick={(e) => onLike(e, resource)}
-                className="absolute top-6 left-6 p-2 rounded-lg bg-white/90 backdrop-blur-sm hover:bg-white shadow-sm border border-gray-100 transition-all z-10 group-hover:scale-110 active:scale-95 flex items-center justify-center w-10 h-10"
+                onClick={handleHeartClick}
+                className="absolute top-4 left-4 p-2 rounded-full hover:bg-red-50 transition-colors z-10"
             >
-                <span className="text-xl leading-none">
-                    {resource.likedBy?.includes(auth.currentUser?.uid) ? '❤️' : '🤍'}
+                <span className={`material-symbols-rounded text-3xl transition-colors ${isLiked ? 'text-red-500 fill-current' : 'text-gray-300'}`}>
+                    favorite
                 </span>
                 {resource.likes > 0 && (
                     <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full shadow-sm border-2 border-white">

@@ -104,43 +104,26 @@ export default function DetailModal({ resource, onClose, userName }) {
                         {/* Title for Print */}
                         <h1 className="hidden print:block text-3xl font-bold mb-4">{resource.title}</h1>
 
-                        {/* Agentic Toolbar */}
-                        <div className="flex gap-2 mb-6 print:hidden">
-                            <button onClick={handleShare} className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-sm font-bold text-gray-700 transition-colors">
-                                <span className="material-symbols-rounded text-lg">share</span> Share
-                            </button>
-                            <button onClick={handleCopyLink} className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-sm font-bold text-gray-700 transition-colors">
-                                <span className="material-symbols-rounded text-lg">link</span> Copy Link
-                            </button>
-                            <button onClick={handlePrint} className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-sm font-bold text-gray-700 transition-colors">
-                                <span className="material-symbols-rounded text-lg">print</span> Print
-                            </button>
-                        </div>
-
-                        <div className="flex flex-wrap gap-3 mb-6">
+                        <div className="flex flex-col gap-4 mb-8">
                             {resource.timeCommitment && (
-                                <span className="inline-flex items-center gap-1 text-sm text-gray-700 bg-purple-50 px-3 py-1.5 rounded-lg border border-purple-100">
-                                    <span className="material-symbols-rounded text-purple-500 text-lg">schedule</span>
-                                    <span className="font-bold">Schedule:</span> {resource.timeCommitment}
-                                </span>
+                                <div className="text-gray-700 text-lg">
+                                    <span className="font-bold text-black">Schedule:</span> {resource.timeCommitment}
+                                </div>
                             )}
                             {resource.cost && (
-                                <span className="inline-flex items-center gap-1 text-sm text-gray-700 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-100">
-                                    <span className="material-symbols-rounded text-emerald-500 text-lg">savings</span>
-                                    <span className="font-bold">Cost:</span> {resource.cost}
-                                </span>
+                                <div className="text-gray-700 text-lg">
+                                    <span className="font-bold text-black">Cost:</span> {resource.cost}
+                                </div>
                             )}
                             {resource.audience && (
-                                <span className="inline-flex items-center gap-1 text-sm text-gray-700 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100">
-                                    <span className="material-symbols-rounded text-blue-500 text-lg">group</span>
-                                    <span className="font-bold">Group:</span> {resource.audience}
-                                </span>
+                                <div className="text-gray-700 text-lg">
+                                    <span className="font-bold text-black">Group:</span> {resource.audience}
+                                </div>
                             )}
                             {resource.location && (
-                                <span className="inline-flex items-center gap-1 text-sm text-gray-700 bg-red-50 px-3 py-1.5 rounded-lg border border-red-100">
-                                    <span className="material-symbols-rounded text-red-500 text-lg">location_on</span>
-                                    <span className="font-bold">Location:</span> {resource.location}
-                                </span>
+                                <div className="text-gray-700 text-lg">
+                                    <span className="font-bold text-black">Location:</span> {resource.location}
+                                </div>
                             )}
                         </div>
 
@@ -160,10 +143,10 @@ export default function DetailModal({ resource, onClose, userName }) {
                         {resource.fileUrl && (
                             <button
                                 onClick={handleDownload}
-                                className="w-full sm:w-auto bg-indigo-600 text-white px-8 py-4 rounded-xl font-bold shadow-lg shadow-indigo-500/30 hover:bg-indigo-700 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 mb-8 print:hidden"
+                                className="w-full sm:w-auto bg-indigo-600 text-white px-10 py-5 rounded-2xl font-bold shadow-xl shadow-indigo-500/30 hover:bg-indigo-700 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 mb-8 print:hidden text-xl"
                             >
-                                <span className="material-symbols-rounded text-2xl">download</span>
-                                Download Resource
+                                <span className="material-symbols-rounded text-3xl">download</span>
+                                Download
                             </button>
                         )}
                     </div>

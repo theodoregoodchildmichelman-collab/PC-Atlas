@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { db, auth } from '../firebase';
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, arrayUnion, arrayRemove, increment, deleteDoc } from 'firebase/firestore';
 import ResourceMap from './ResourceMap';
@@ -172,6 +172,32 @@ export default function Feed({ onResourceClick, viewMode, userName, onEdit }) {
     }
 
     const [showMap, setShowMap] = useState(false);
+    const scrollRef = useRef(null);
+    const [isDragging, setIsDragging] = useState(false);
+    const [startX, setStartX] = useState(0);
+    const [scrollLeft, setScrollLeft] = useState(0);
+
+    const handleMouseDown = (e) => {
+        setIsDragging(true);
+        setStartX(e.pageX - scrollRef.current.offsetLeft);
+        setScrollLeft(scrollRef.current.scrollLeft);
+    };
+
+    const handleMouseLeave = () => {
+        setIsDragging(false);
+    };
+
+    const handleMouseUp = () => {
+        setIsDragging(false);
+    };
+
+    const handleMouseMove = (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+        const x = e.pageX - scrollRef.current.offsetLeft;
+        const walk = (x - startX) * 2; // Scroll-fast
+        scrollRef.current.scrollLeft = scrollLeft - walk;
+    };
 
     if (loading) {
         return (
@@ -198,7 +224,14 @@ export default function Feed({ onResourceClick, viewMode, userName, onEdit }) {
 
                 {/* Categories & Filters */}
                 <div className="w-full flex justify-center">
-                    <div className="flex flex-col sm:flex-row gap-4 items-center overflow-x-auto pb-4 sm:pb-0 scrollbar-hide max-w-full px-4">
+                    <div
+                        ref={scrollRef}
+                        onMouseDown={handleMouseDown}
+                        onMouseLeave={handleMouseLeave}
+                        onMouseUp={handleMouseUp}
+                        onMouseMove={handleMouseMove}
+                        className="flex flex-col sm:flex-row gap-4 items-center overflow-x-auto pb-4 sm:pb-0 scrollbar-hide max-w-full px-4 cursor-grab active:cursor-grabbing"
+                    >
 
                         {/* Group 1: All & Top */}
                         <div className="flex gap-2 bg-gray-100 p-1.5 rounded-full flex-shrink-0">

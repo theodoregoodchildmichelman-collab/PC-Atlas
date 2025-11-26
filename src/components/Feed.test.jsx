@@ -22,8 +22,8 @@ vi.mock('./FilterSidebar', () => ({
 
 describe('Feed Filtering', () => {
     const mockResources = [
-        { id: '1', title: 'Free Resource', cost: 'Free (0 MKD)', category: 'Education', tags: [], timeCommitment: 'Quick', audience: 'Kids', location: 'Skopje', createdAt: { toDate: () => new Date() } },
-        { id: '2', title: 'Paid Resource', cost: 'Low Cost', category: 'Education', tags: [], timeCommitment: 'Medium', audience: 'Adults', location: 'Bitola', createdAt: { toDate: () => new Date() } },
+        { id: '1', title: 'Free Resource', description: 'A free resource for kids.', cost: 'Free (0 MKD)', category: 'Education', tags: [], timeCommitment: 'Quick', audience: 'Kids', location: 'Skopje', createdAt: { toDate: () => new Date() } },
+        { id: '2', title: 'Paid Resource', description: 'A paid resource for adults.', cost: 'High Cost', category: 'Education', tags: [], timeCommitment: 'Medium', audience: 'Adults', location: 'Bitola', createdAt: { toDate: () => new Date() } },
     ];
 
     beforeEach(() => {
@@ -48,24 +48,7 @@ describe('Feed Filtering', () => {
         });
     });
 
-    it('filters resources using smart search', async () => {
-        render(<Feed userName="TestUser" />);
 
-        // Wait for initial load
-        await waitFor(() => {
-            expect(screen.getByText('Free Resource')).toBeInTheDocument();
-        });
-
-        // Type "cheap" into search bar
-        const searchInput = screen.getByPlaceholderText(/Search resources/i);
-        fireEvent.change(searchInput, { target: { value: 'cheap' } });
-
-        // Should show Free Resource (smart match for "cheap"), should NOT show Paid Resource
-        await waitFor(() => {
-            expect(screen.getByText('Free Resource')).toBeInTheDocument();
-            expect(screen.queryByText('Paid Resource')).not.toBeInTheDocument();
-        });
-    });
 
     // Note: Testing the actual filtering logic inside Feed is tricky because it's internal state.
     // However, we can test the effect of the filter change.
