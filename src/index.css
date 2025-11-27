@@ -4,16 +4,12 @@
 
 @theme {
     --font-sans: 'Inter', sans-serif;
-    --color-atlas-cream: #FDFBF7;
-    --color-atlas-blue: #5B85AA;
-    --color-atlas-navy: #1E293B;
-    --color-atlas-orange: #F2994A;
 }
 
 @layer base {
     body {
         font-family: var(--font-sans);
-        @apply antialiased text-atlas-navy bg-atlas-cream;
+        @apply antialiased text-gray-900 bg-gray-50;
     }
 }
 
@@ -22,7 +18,7 @@
 }
 
 @utility glass-card {
-    @apply bg-white rounded-3xl border border-gray-100 shadow-xl shadow-indigo-500/5;
+    @apply bg-white/70 backdrop-blur-sm border border-white/50 shadow-xl shadow-indigo-500/5;
 }
 
 @utility scrollbar-hide {

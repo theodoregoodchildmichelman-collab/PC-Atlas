@@ -90,7 +90,7 @@ export default function DetailModal({ resource, onClose, userName }) {
                 {/* Header Image - Dynamic Height */}
                 <div className="min-h-[200px] h-auto py-8 bg-gradient-to-r from-indigo-500 to-purple-600 relative print:hidden flex-shrink-0 flex items-center justify-center">
                     <div className="text-center px-8 w-full">
-                        <h2 className="text-xl sm:text-4xl font-bold text-white drop-shadow-md leading-tight">{resource.title}</h2>
+                        <h2 className="text-3xl sm:text-4xl font-bold text-white drop-shadow-md leading-tight">{resource.title}</h2>
                     </div>
                     <button
                         onClick={onClose}
@@ -110,8 +110,9 @@ export default function DetailModal({ resource, onClose, userName }) {
                         {resource.fileUrl && (
                             <button
                                 onClick={handleDownload}
-                                className="w-full bg-atlas-blue text-white px-6 py-4 rounded-full font-bold shadow-lg shadow-indigo-500/30 hover:bg-opacity-90 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 mb-8 print:hidden text-lg sm:text-xl"
+                                className="w-full bg-indigo-600 text-white px-6 py-4 rounded-xl font-bold shadow-lg shadow-indigo-500/30 hover:bg-indigo-700 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 mb-8 print:hidden text-lg sm:text-xl"
                             >
+                                <span className="material-symbols-rounded text-2xl sm:text-3xl">download</span>
                                 Download
                             </button>
                         )}
