@@ -34,8 +34,7 @@ describe('ResourceCard', () => {
 
         expect(screen.getByText('Test Resource')).toBeInTheDocument();
         expect(screen.getByText('Test Description')).toBeInTheDocument();
-        expect(screen.getByText('Tag1')).toBeInTheDocument();
-        expect(screen.getByText('TestUser')).toBeInTheDocument();
+        // Tags and Author are now in the detail view, not the card
     });
 
     it('shows Edit/Delete buttons only for the author', () => {
