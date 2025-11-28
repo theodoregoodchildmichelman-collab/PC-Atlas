@@ -7,7 +7,6 @@ import Feed from './components/Feed';
 import DetailModal from './components/DetailModal';
 import NameEntry from './components/NameEntry';
 import SavedResources from './pages/SavedResources';
-import logo from './assets/logo.png';
 
 /*
 FIRESTORE SCHEMA
@@ -52,13 +51,10 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 text-gray-900 font-sans pb-20 selection:bg-indigo-100 selection:text-indigo-900">
-      <header className="bg-white sticky top-0 z-50 shadow-sm transition-all duration-300">
-        <div className="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center relative">
-          <Link to="/" className="flex items-center gap-2 group">
-            <img src={logo} alt="Peace Corps Atlas Logo" className="h-10 w-auto object-contain group-hover:scale-105 transition-transform" />
-            <span className="text-xl font-bold text-gray-900 tracking-tight hidden sm:block">
-              Atlas
-            </span>
+      <header className="glass sticky top-0 z-10 transition-all duration-300">
+        <div className="max-w-3xl mx-auto px-4 py-4 flex justify-between items-center">
+          <Link to="/" className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-600 tracking-tight flex items-center gap-2">
+            Мировен Корпус Атлас {/* v1.1 */}
           </Link>
 
           <div className="flex items-center gap-3">
