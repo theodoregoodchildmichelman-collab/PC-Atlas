@@ -69,7 +69,8 @@ export default function ResourceMap({ resources, onResourceClick }) {
                     >
                         <Popup>
                             <div className="min-w-[200px]">
-                                <h3 className="font-bold text-gray-900 mb-2">{resource.title}</h3>
+                                <h3 className="font-bold text-gray-900 mb-1">{resource.title}</h3>
+                                <p className="text-xs text-gray-500 mb-2">by {resource.authorName || 'Anonymous'}</p>
                                 <div className="flex flex-wrap gap-1 mb-3">
                                     {resource.tags.slice(0, 3).map(tag => (
                                         <span key={tag} className="text-[10px] bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded border border-indigo-100">
