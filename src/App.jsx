@@ -7,6 +7,7 @@ import Feed from './components/Feed';
 import DetailModal from './components/DetailModal';
 import NameEntry from './components/NameEntry';
 import SavedResources from './pages/SavedResources';
+import logo from './assets/logo.png';
 
 /*
 FIRESTORE SCHEMA
@@ -51,42 +52,48 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 text-gray-900 font-sans pb-20 selection:bg-indigo-100 selection:text-indigo-900">
-      <header className="glass sticky top-0 z-10 transition-all duration-300">
-        <div className="max-w-3xl mx-auto px-4 py-4 flex justify-between items-center">
-          <Link to="/" className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-600 tracking-tight flex items-center gap-2">
-            Мировен Корпус Атлас {/* v1.1 */}
+      <header className="bg-white sticky top-0 z-50 shadow-sm transition-all duration-300">
+        <div className="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center relative">
+          <Link to="/" className="flex items-center gap-2 group">
+            <img src={logo} alt="Peace Corps Atlas Logo" className="h-10 w-auto object-contain group-hover:scale-105 transition-transform" />
+            <span className="text-xl font-bold text-gray-900 tracking-tight hidden sm:block">
+              Atlas
+            </span>
           </Link>
 
           <div className="flex items-center gap-3">
-            {/* Navigation Links */}
-            {/* View Toggle (Only on Feed) - REMOVED as Map is now a widget */}
-
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2 sm:gap-4">
               <Link
                 to="/my-saved-resources"
-                className="bg-red-600 text-white px-8 py-3 rounded-full font-bold shadow-lg shadow-red-600/20 hover:scale-105 active:scale-95 transition-all flex items-center justify-center"
+                className="text-gray-600 hover:text-red-500 px-4 py-2 rounded-full font-bold hover:bg-red-50 transition-all flex items-center gap-2"
                 title="Saved Resources"
               >
-                Favorite
+                <span className="material-symbols-rounded">favorite</span>
+                <span className="hidden sm:inline">Saved</span>
               </Link>
+
               <button
                 onClick={() => setShowUpload(true)}
-                className="bg-gray-900 text-white px-8 py-3 rounded-full font-bold shadow-lg shadow-gray-900/20 hover:scale-105 active:scale-95 transition-all"
+                className="bg-atlas-blue text-white px-6 py-2.5 rounded-full font-bold shadow-lg shadow-indigo-500/20 hover:bg-opacity-90 hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
               >
-                Share
+                <span className="material-symbols-rounded">add</span>
+                <span className="hidden sm:inline">Share</span>
               </button>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-4 py-8">
+      <main className="max-w-5xl mx-auto px-4 py-8">
         {location.pathname === '/' && (
-          <div className="mb-8 text-center sm:text-left animate-fade-in">
-            <h2 className="text-4xl font-bold text-gray-900 mb-2 tracking-tight">
-              Share knowledge: <span className="text-blue-600">volunteer</span> to <span className="text-blue-600">volunteer</span>.
+          <div className="mb-12 text-center animate-fade-in">
+            <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4 tracking-tight leading-tight">
+              Share knowledge. <br className="hidden sm:block" />
+              <span className="text-atlas-blue">Volunteer</span> to <span className="text-atlas-blue">volunteer</span>.
             </h2>
-            <p className="text-gray-500 text-lg">A centralized repository of educational best practices, camp itineraries, and club guides.</p>
+            <p className="text-gray-500 text-lg sm:text-xl max-w-2xl mx-auto">
+              A centralized repository of educational best practices, camp itineraries, and club guides for Peace Corps Macedonia.
+            </p>
           </div>
         )}
 
