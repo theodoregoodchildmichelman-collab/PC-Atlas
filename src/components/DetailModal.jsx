@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useToast } from './ToastContext';
 import { db, auth } from '../firebase';
 import { collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from 'firebase/firestore';
 
@@ -6,6 +7,7 @@ export default function DetailModal({ resource, onClose, userName }) {
     const [comments, setComments] = useState([]);
     const [comment, setComment] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isDownloading, setIsDownloading] = useState(false);
 
     useEffect(() => {
         if (!resource?.id) return;
@@ -27,10 +29,32 @@ export default function DetailModal({ resource, onClose, userName }) {
         return () => unsubscribe();
     }, [resource?.id]);
 
-    const handleDownload = () => {
-        if (resource.fileUrl) {
-            window.open(resource.fileUrl, '_blank');
-            // TODO: Increment download count in Firestore
+    const { showToast } = useToast();
+
+    const handleDownload = async () => {
+        const url = resource.fileURL || resource.fileUrl;
+        if (url) {
+            showToast("Starting download...", "info");
+            try {
+                const response = await fetch(url);
+                const blob = await response.blob();
+                const blobUrl = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = blobUrl;
+                link.download = resource.fileName || 'download';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(blobUrl);
+                showToast("Download successful!", "success");
+                // TODO: Increment download count in Firestore
+            } catch (error) {
+                console.error("Download failed:", error);
+                showToast("Direct download failed. Opening in new tab...", "error");
+                window.open(url, '_blank');
+            }
+        } else {
+            showToast("No file attached to this resource.", "error");
         }
     };
 
@@ -105,19 +129,23 @@ export default function DetailModal({ resource, onClose, userName }) {
                         <h1 className="hidden print:block text-3xl font-bold mb-4">{resource.title}</h1>
 
                         {/* Download Button - Prioritized */}
-                        {resource.fileUrl && (
+                        {(resource.fileURL || resource.fileUrl) && (
                             <div className="flex flex-col items-center gap-6 mb-8 w-full">
                                 <button
-                                    onClick={handleDownload}
-                                    className="w-full sm:w-auto min-w-[200px] bg-atlas-blue text-white px-8 py-4 rounded-full font-bold shadow-lg shadow-indigo-500/30 hover:bg-opacity-90 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center text-lg sm:text-xl"
+                                    onClick={async () => {
+                                        setIsDownloading(true);
+                                        await handleDownload().finally(() => setIsDownloading(false));
+                                    }}
+                                    disabled={isDownloading}
+                                    className={`w-full sm:w-auto min-w-[200px] text-white px-8 py-4 rounded-full font-bold shadow-lg shadow-indigo-500/30 transition-all flex items-center justify-center text-lg sm:text-xl ${isDownloading ? 'bg-gray-400 cursor-wait' : 'bg-indigo-600 hover:bg-opacity-90 hover:scale-[1.02] active:scale-[0.98] cursor-pointer'}`}
                                 >
-                                    Download
+                                    {isDownloading ? 'Downloading...' : 'Download'}
                                 </button>
 
                                 {/* Document Preview */}
                                 <div className="w-full max-w-4xl h-[500px] bg-gray-100 rounded-2xl overflow-hidden border border-gray-200 shadow-inner">
                                     <iframe
-                                        src={`https://docs.google.com/viewer?url=${encodeURIComponent(resource.fileUrl)}&embedded=true`}
+                                        src={`https://docs.google.com/viewer?url=${encodeURIComponent(resource.fileURL || resource.fileUrl)}&embedded=true`}
                                         className="w-full h-full"
                                         title="Document Preview"
                                         loading="lazy"

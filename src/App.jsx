@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation, NavLink } from 'react-router-dom';
 import { auth } from './firebase';
-import { signInAnonymously, onAuthStateChanged } from 'firebase/auth';
+import { signInAnonymously, onAuthStateChanged, signOut } from 'firebase/auth';
+import { AuthProvider, useAuth } from './components/AuthProvider';
+import { ToastProvider } from './components/ToastContext';
 import UploadForm from './components/UploadForm';
 import Feed from './components/Feed';
 import DetailModal from './components/DetailModal';
@@ -21,6 +23,7 @@ function AppContent() {
   const [editingResource, setEditingResource] = useState(null);
   const [selectedResource, setSelectedResource] = useState(null);
   const [viewMode, setViewMode] = useState('list'); // 'list' or 'map'
+  const [isUploadOpen, setIsUploadOpen] = useState(false); // Added missing state
   const location = useLocation();
 
   useEffect(() => {
@@ -44,6 +47,20 @@ function AppContent() {
   const handleEditResource = (resource) => {
     setEditingResource(resource);
     setShowUpload(true);
+    setIsUploadOpen(true);
+  };
+
+  const handleResourceClick = (resource) => {
+    setSelectedResource(resource);
+  };
+
+  const handleLogin = () => {
+    // Placeholder for login logic
+    console.log("Login clicked");
+  };
+
+  const handleLogout = () => {
+    signOut(auth).catch((error) => console.error("Sign out error", error));
   };
 
   if (!userName) {
@@ -51,73 +68,116 @@ function AppContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 text-gray-900 font-sans pb-20 selection:bg-indigo-100 selection:text-indigo-900">
-      <header className="glass sticky top-0 z-10 transition-all duration-300">
-        <div className="max-w-3xl mx-auto px-4 py-4 flex justify-between items-center">
-          <Link to="/" className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-600 tracking-tight flex items-center gap-2">
-            Мировен Корпус Атлас {/* v1.1 */}
-          </Link>
-
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 sm:gap-4">
-              <Link
-                to="/map"
-                className="text-gray-600 hover:text-atlas-blue px-4 py-2 rounded-full font-bold hover:bg-indigo-50 transition-all flex items-center gap-2"
-                title="Atlas Map"
-              >
-                <span className="material-symbols-rounded">map</span>
-                <span className="hidden sm:inline">Atlas</span>
-              </Link>
-
-              <Link
-                to="/my-saved-resources"
-                className="text-gray-600 hover:text-red-500 px-4 py-2 rounded-full font-bold hover:bg-red-50 transition-all flex items-center gap-2"
-                title="Saved Resources"
-              >
-                <span className="material-symbols-rounded">favorite</span>
-                <span className="hidden sm:inline">Saved</span>
-              </Link>
-
-              <button
-                onClick={() => setShowUpload(true)}
-                className="bg-atlas-blue text-white px-6 py-2.5 rounded-full font-bold shadow-lg shadow-indigo-500/20 hover:bg-opacity-90 hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
-              >
-                <span className="material-symbols-rounded">add</span>
-                <span className="hidden sm:inline">Share</span>
-              </button>
+    <div className="min-h-screen bg-gray-50 font-sans text-gray-900 selection:bg-indigo-100 selection:text-indigo-900">
+      {/* Header */}
+      <header className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md z-50 border-b border-gray-100 transition-all duration-300">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+          {/* Logo Area */}
+          <div className="flex items-center gap-3 group cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+            <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center text-white shadow-lg group-hover:scale-105 transition-transform duration-300">
+              <span className="material-symbols-rounded text-2xl">public</span>
             </div>
+            <div className="flex flex-col">
+              <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 tracking-tight">
+                Peace Corps Atlas
+              </h1>
+              <span className="text-xs text-gray-500 font-medium tracking-wide uppercase">North Macedonia</span>
+            </div>
+          </div>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center gap-2 bg-gray-100/50 p-1.5 rounded-full">
+            <NavLink to="/" className={({ isActive }) => `flex items-center gap-2 px-4 py-2 rounded-full font-bold text-sm transition-all ${isActive ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:bg-gray-50'}`}>
+              <span className="material-symbols-rounded text-lg">home</span>
+              Feed
+            </NavLink>
+            <NavLink to="/map" className={({ isActive }) => `flex items-center gap-2 px-4 py-2 rounded-full font-bold text-sm transition-all ${isActive ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:bg-gray-50'}`}>
+              <span className="material-symbols-rounded text-lg">map</span>
+              Atlas
+            </NavLink>
+            <NavLink to="/saved" className={({ isActive }) => `flex items-center gap-2 px-4 py-2 rounded-full font-bold text-sm transition-all ${isActive ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:bg-gray-50'}`}>
+              <span className="material-symbols-rounded text-lg">bookmark</span>
+              Saved
+            </NavLink>
+          </nav>
+
+          {/* User Profile / Mobile Menu Toggle */}
+          <div className="flex items-center gap-4">
+            {user ? (
+              <div className="flex items-center gap-3 pl-4 border-l border-gray-200">
+                <div className="hidden sm:flex flex-col items-end">
+                  <span className="text-sm font-bold text-gray-900">{userName}</span>
+                  <span className="text-xs text-gray-500">Volunteer</span>
+                </div>
+                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 p-0.5 cursor-pointer hover:shadow-md transition-all active:scale-95" onClick={handleLogout} title="Click to Logout">
+                  <div className="w-full h-full rounded-full bg-white flex items-center justify-center overflow-hidden">
+                    {user.photoURL ? (
+                      <img src={user.photoURL} alt={userName} className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="font-bold text-indigo-600 text-lg">{userName ? userName[0] : 'U'}</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={handleLogin}
+                className="px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm hover:bg-gray-800 transition-all shadow-lg shadow-gray-900/20 active:scale-95 flex items-center gap-2"
+              >
+                <span className="material-symbols-rounded text-lg">login</span>
+                Sign In
+              </button>
+            )}
           </div>
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-4 py-8">
-        {location.pathname === '/' && (
-          <div className="mb-12 text-center animate-fade-in">
-            <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4 tracking-tight leading-tight">
-              Share knowledge. <br className="hidden sm:block" />
-              <span className="text-atlas-blue">Volunteer</span> to <span className="text-atlas-blue">volunteer</span>.
-            </h2>
-            <p className="text-gray-500 text-lg sm:text-xl max-w-2xl mx-auto">
-              A centralized repository of educational best practices, camp itineraries, and club guides for Peace Corps Macedonia.
-            </p>
-          </div>
-        )}
-
+      {/* Main Content */}
+      <main className="pt-28 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto min-h-[calc(100vh-80px)]">
         <Routes>
-          <Route path="/" element={<Feed onResourceClick={setSelectedResource} viewMode={viewMode} userName={userName} onEdit={handleEditResource} />} />
-          <Route path="/map" element={<AtlasMap onResourceClick={setSelectedResource} />} />
-          <Route path="/my-saved-resources" element={<SavedResources onResourceClick={setSelectedResource} userName={userName} onEdit={handleEditResource} />} />
+          <Route path="/" element={
+            <Feed
+              onResourceClick={handleResourceClick}
+              viewMode={viewMode}
+              userName={userName}
+              onEdit={handleEditResource}
+            />
+          } />
+          <Route path="/map" element={<AtlasMap onResourceClick={handleResourceClick} />} />
+          <Route path="/saved" element={<SavedResources onResourceClick={handleResourceClick} userName={userName} onEdit={handleEditResource} />} />
         </Routes>
       </main>
 
-      {showUpload && (
+      {/* Floating Action Button (Upload) */}
+      {user && (
+        <button
+          onClick={() => setIsUploadOpen(true)}
+          className="fixed bottom-8 left-1/2 -translate-x-1/2 md:left-auto md:right-8 md:translate-x-0 bg-gray-900 text-white pl-5 pr-6 py-4 rounded-full shadow-2xl shadow-indigo-500/40 hover:scale-105 active:scale-95 transition-all z-40 flex items-center gap-3 group"
+        >
+          <span className="material-symbols-rounded text-3xl group-hover:rotate-90 transition-transform duration-300">add</span>
+          <span className="font-bold text-lg tracking-wide">Share</span>
+        </button>
+      )}
+
+      {/* Modals */}
+      {isUploadOpen && (
         <UploadForm
-          onClose={() => { setShowUpload(false); setEditingResource(null); }}
+          onClose={() => {
+            setIsUploadOpen(false);
+            setEditingResource(null);
+          }}
           userName={userName}
           initialData={editingResource}
         />
       )}
-      {selectedResource && <DetailModal resource={selectedResource} onClose={() => setSelectedResource(null)} userName={userName} />}
+
+      {selectedResource && (
+        <DetailModal
+          resource={selectedResource}
+          onClose={() => setSelectedResource(null)}
+          userName={userName}
+        />
+      )}
     </div>
   );
 }
@@ -125,7 +185,11 @@ function AppContent() {
 export default function App() {
   return (
     <Router>
-      <AppContent />
+      <AuthProvider>
+        <ToastProvider>
+          <AppContent />
+        </ToastProvider>
+      </AuthProvider>
     </Router>
   );
 }

@@ -17,7 +17,8 @@ describe('ResourceCard', () => {
         cost: 'Free',
         audience: 'Kids',
         location: 'Skopje',
-        tags: ['Tag1']
+        tags: ['Tag1'],
+        fileUrl: 'http://example.com/file.pdf'
     };
 
     const mockHandlers = {
@@ -69,5 +70,9 @@ describe('ResourceCard', () => {
         // Click Delete
         fireEvent.click(screen.getByText('delete'));
         expect(mockHandlers.onDelete).toHaveBeenCalledWith(mockResource);
+
+        // Click Download
+        fireEvent.click(screen.getByText('Download'));
+        expect(mockHandlers.onDownload).toHaveBeenCalledWith(expect.anything(), mockResource);
     });
 });

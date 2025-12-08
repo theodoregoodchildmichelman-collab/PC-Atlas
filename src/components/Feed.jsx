@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useToast } from './ToastContext';
 import { db, auth } from '../firebase';
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, arrayUnion, arrayRemove, increment, deleteDoc } from 'firebase/firestore';
 import ResourceMap from './ResourceMap';
@@ -95,10 +96,37 @@ export default function Feed({ onResourceClick, viewMode, userName, onEdit }) {
         }
     };
 
-    const handleQuickDownload = (e, resource) => {
+    const { showToast } = useToast();
+
+    const handleQuickDownload = async (e, resource) => {
         e.stopPropagation();
-        if (resource.fileUrl) {
-            window.open(resource.fileUrl, '_blank');
+        const url = resource.fileURL || resource.fileUrl;
+        if (!url) {
+            showToast("No file attached to this resource.", "error");
+            return;
+        }
+
+        showToast("Starting download...", "info");
+
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error("Network response was not ok");
+
+            const blob = await response.blob();
+            const blobUrl = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.download = resource.fileName || 'download';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(blobUrl);
+            showToast("Download successful!", "success");
+        } catch (error) {
+            console.error("Download failed:", error);
+            showToast("Direct download failed. Opening in new tab...", "error");
+            // Fallback to opening in new tab
+            window.open(url, '_blank');
         }
     };
 
