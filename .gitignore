@@ -36,3 +36,6 @@ lerna-debug.log*
 
 # Netlify
 .netlify/
+
+# Environment Variables
+.env

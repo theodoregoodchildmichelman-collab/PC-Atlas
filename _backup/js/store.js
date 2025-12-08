@@ -20,21 +20,21 @@ try {
 } catch (e) {
     // --- YOUR SPECIFIC KEYS ARE HERE ---
     firebaseConfig = {
-        apiKey: "AIzaSyA7ubplpyeEMOZKgD5yk3xUrWB8Q4ztltI",
-        authDomain: "pc-repository.firebaseapp.com",
-        projectId: "pc-repository",
-        storageBucket: "pc-repository.firebasestorage.app",
-        messagingSenderId: "938359035802",
-        appId: "1:938359035802:web:27cf9ff75c2f4edf6acc23",
-        measurementId: "G-4L9QX1QJPC",
-        databaseURL: "https://pc-repository-default-rtdb.firebaseio.com/"
+        apiKey: "REDACTED",
+        authDomain: "REDACTED",
+        projectId: "REDACTED",
+        storageBucket: "REDACTED",
+        messagingSenderId: "REDACTED",
+        appId: "REDACTED",
+        measurementId: "REDACTED",
+        databaseURL: "REDACTED"
     };
 }
 // --- CONFIGURATION END ---
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const db = getDatabase(app); 
+const db = getDatabase(app);
 const storage = getStorage(app);
 const auth = getAuth(app);
 
@@ -100,13 +100,13 @@ export const Store = {
 
             this.loading = false;
             // Check if Actions is available globally to trigger render
-            if(window.Actions && window.Actions.renderApp) {
+            if (window.Actions && window.Actions.renderApp) {
                 window.Actions.renderApp();
             }
         }, (error) => {
             console.error("Data Fetch Error:", error);
             this.loading = false;
-            if(window.Actions && window.Actions.renderApp) {
+            if (window.Actions && window.Actions.renderApp) {
                 window.Actions.renderApp();
             }
         });
@@ -121,7 +121,7 @@ export const Store = {
 
             // 2. Push Metadata to Realtime DB
             const resourcesRef = ref(db, RESOURCES_PATH);
-            const newResourceRef = push(resourcesRef); 
+            const newResourceRef = push(resourcesRef);
 
             const docData = {
                 ...metadata,
@@ -130,7 +130,7 @@ export const Store = {
                 timestamp: new Date().toISOString(),
                 date: new Date().toISOString(),
                 downloads: 0,
-                comments: [] 
+                comments: []
             };
 
             await set(newResourceRef, docData);
@@ -151,7 +151,7 @@ export const Store = {
             const findAndReply = (list) => {
                 for (let c of list) {
                     if (c.id === parentCommentId) {
-                        if(!c.replies) c.replies = [];
+                        if (!c.replies) c.replies = [];
                         c.replies.push(commentObject);
                         return true;
                     }
