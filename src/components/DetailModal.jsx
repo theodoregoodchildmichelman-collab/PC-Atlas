@@ -106,13 +106,23 @@ export default function DetailModal({ resource, onClose, userName }) {
 
                         {/* Download Button - Prioritized */}
                         {resource.fileUrl && (
-                            <div className="flex justify-center mb-8">
+                            <div className="flex flex-col items-center gap-6 mb-8 w-full">
                                 <button
                                     onClick={handleDownload}
                                     className="w-full sm:w-auto min-w-[200px] bg-atlas-blue text-white px-8 py-4 rounded-full font-bold shadow-lg shadow-indigo-500/30 hover:bg-opacity-90 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center text-lg sm:text-xl"
                                 >
                                     Download
                                 </button>
+
+                                {/* Document Preview */}
+                                <div className="w-full max-w-4xl h-[500px] bg-gray-100 rounded-2xl overflow-hidden border border-gray-200 shadow-inner">
+                                    <iframe
+                                        src={`https://docs.google.com/viewer?url=${encodeURIComponent(resource.fileUrl)}&embedded=true`}
+                                        className="w-full h-full"
+                                        title="Document Preview"
+                                        loading="lazy"
+                                    ></iframe>
+                                </div>
                             </div>
                         )}
 

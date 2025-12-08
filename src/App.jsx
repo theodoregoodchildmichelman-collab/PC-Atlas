@@ -7,6 +7,7 @@ import Feed from './components/Feed';
 import DetailModal from './components/DetailModal';
 import NameEntry from './components/NameEntry';
 import SavedResources from './pages/SavedResources';
+import AtlasMap from './pages/AtlasMap';
 
 /*
 FIRESTORE SCHEMA
@@ -60,6 +61,15 @@ function AppContent() {
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 sm:gap-4">
               <Link
+                to="/map"
+                className="text-gray-600 hover:text-atlas-blue px-4 py-2 rounded-full font-bold hover:bg-indigo-50 transition-all flex items-center gap-2"
+                title="Atlas Map"
+              >
+                <span className="material-symbols-rounded">map</span>
+                <span className="hidden sm:inline">Atlas</span>
+              </Link>
+
+              <Link
                 to="/my-saved-resources"
                 className="text-gray-600 hover:text-red-500 px-4 py-2 rounded-full font-bold hover:bg-red-50 transition-all flex items-center gap-2"
                 title="Saved Resources"
@@ -95,6 +105,7 @@ function AppContent() {
 
         <Routes>
           <Route path="/" element={<Feed onResourceClick={setSelectedResource} viewMode={viewMode} userName={userName} onEdit={handleEditResource} />} />
+          <Route path="/map" element={<AtlasMap onResourceClick={setSelectedResource} />} />
           <Route path="/my-saved-resources" element={<SavedResources onResourceClick={setSelectedResource} userName={userName} onEdit={handleEditResource} />} />
         </Routes>
       </main>

@@ -36,6 +36,7 @@
     "react-router-dom": "^7.9.6",
     "tailwindcss": "^4.1.17",
     "vite": "^7.2.4",
+    "vite-plugin-pwa": "^1.2.0",
     "vitest": "^4.0.14"
   }
 }
